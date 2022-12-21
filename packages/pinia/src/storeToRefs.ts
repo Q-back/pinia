@@ -1,7 +1,9 @@
 import {
+  ComputedRef,
   isReactive,
   isRef,
   isVue2,
+  Ref,
   toRaw,
   toRef,
   ToRefs,
@@ -10,6 +12,13 @@ import {
 import { StoreGetters, StoreState } from './store'
 import type { PiniaCustomStateProperties, StoreGeneric } from './types'
 
+type RefIfNotComputed<T> = T extends ComputedRef ? ComputedRef<T> : Ref<T>
+type ComputedIfNotFunction<T> = T extends (...args: any[]) => any
+  ? RefIfNotComputed<T>
+  : T
+export type StoreToRefs<T extends StoreGeneric> = {
+  [K in keyof T]: K extends Ref ? Ref<K> : ComputedIfNotFunction<K>
+}
 /**
  * Creates an object of references with all the state, getters, and plugin-added
  * state properties of the store. Similar to `toRefs()` but specifically
