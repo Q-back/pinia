@@ -124,6 +124,21 @@ describe('storeToRefs', () => {
     ).toEqual(objectOfRefs({ n: 1, double: 2 }))
   })
 
+  it('is possible to use computed as getters', () => {
+    const store = defineStore('test', () => {
+      const userInternal = ref({ name: 'John' })
+      const user = computed(() => userInternal.value)
+      return {
+        userInternal,
+        user,
+      }
+    })
+
+    const mapped = storeToRefs(store())
+    mapped.user.value.name = 'Jane' // this should not compile
+    mapped.userInternal.value.name = 'Jane' // this should compile
+  })
+
   it('contain plugin states', () => {
     const pinia = createPinia()
     // directly push because no app
